@@ -24,6 +24,7 @@ const Wrapper = styled.div`
 
 const A = styled.a`
   padding-left: 1rem;
+  color: #f56161;
   &:hover {
     color: #007bff;
     text-decoration: underline;
