@@ -36,6 +36,39 @@ async function create(name, entityName) {
   }
 }
 
+// Método para popular Category, Developer, Platform , Publisher
+
+async function createManyToManyData(products) {
+  const developers = {};
+  const publishers = {};
+  const categories = {}; //category[action] exemplo
+  const platforms = {};
+
+  products.forEach((product) => {
+    const { developer, publisher, genres, supportedOperatingSystems } = product;
+
+    genres &&
+      genres.forEach((item) => {
+        categories[item] = true;
+      });
+
+    supportedOperatingSystems &&
+      supportedOperatingSystems.forEach((item) => {
+        platforms[item] = true;
+      });
+
+    developers[developer] = true;
+    publishers[publisher] = true;
+  });
+
+  return Promise.all([
+    ...Object.keys(developers).map((name) => create(name, "developer")),
+    ...Object.keys(publishers).map((name) => create(name, "publisher")),
+    ...Object.keys(categories).map((name) => create(name, "category")),
+    ...Object.keys(platforms).map((name) => create(name, "platform")),
+  ]);
+}
+
 module.exports = {
   populate: async (params) => {
     const gogApiUrl = `https://www.gog.com/games/ajax/filtered?mediaType=game&page=1&sort=popularity`;
@@ -43,8 +76,7 @@ module.exports = {
       data: { products },
     } = await axios.get(gogApiUrl);
 
-    await create(products[2].publisher, "publisher");
-    await create(products[2].publisher, "developer");
+    await createManyToManyData([products[4], products[5]]);
 
     // console.log(await getByName("CD PROJEKT RED", "publisher"));
   },
